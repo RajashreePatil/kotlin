@@ -1,9 +1,8 @@
 package soSuspendableCallInFunFromOtherStepping
 
-import forTests.builder
-import forTests.WaitFinish
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.suspendCoroutine
+import forTests.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
 
 private fun foo(a: Any) {}
 
