@@ -83,11 +83,20 @@ private fun makeKotlinType(
     val kotlinTypeArguments = arguments.mapIndexed { index, it ->
         when (it) {
             is IrTypeProjection -> TypeProjectionImpl(it.variance, it.type.toKotlinType())
-            is IrStarProjection -> StarProjectionImpl((classifier.descriptor as ClassDescriptor).declaredTypeParameters[index])
+            is IrStarProjection -> StarProjectionImpl(getTypeParameters((classifier.descriptor as ClassDescriptor))[index])
             else -> error(it)
         }
     }
     return classifier.descriptor.defaultType.replace(newArguments = kotlinTypeArguments).makeNullableAsSpecified(hasQuestionMark)
+}
+
+private fun getTypeParameters(descriptor: ClassDescriptor): List<TypeParameterDescriptor> {
+    return if (descriptor.isInner) {
+        ((descriptor.containingDeclaration as? ClassDescriptor)?.let { getTypeParameters(it) }
+            ?: return descriptor.declaredTypeParameters) + descriptor.declaredTypeParameters
+    } else {
+        descriptor.declaredTypeParameters
+    }
 }
 
 fun ClassifierDescriptor.toIrType(hasQuestionMark: Boolean = false): IrType {
